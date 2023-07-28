@@ -20,11 +20,15 @@ namespace TinyAD_ext
         const double beta2 = 0.999,
         const double epsilon = 1e-8)
     {
-        static Eigen::VectorX<PassiveT> v = Eigen::VectorX<PassiveT>::zeros(_g.size());
-        static Eigen::VectorX<PassiveT> s = Eigen::VectorX<PassiveT>::zeros(_g.size());
-        v = beta1 * v + (1 - beta1) * _g;
-        s = beta2 * v + (1 - beta2) * pow(_g, 2);
-        const Eigen::VectorX<PassiveT> d = -v / (sqrt(s) + epsilon);
+        static Eigen::VectorX<PassiveT> v = Eigen::VectorX<PassiveT>::Zero(_g.size());
+        static Eigen::VectorX<PassiveT> s = Eigen::VectorX<PassiveT>::Zero(_g.size());
+        Eigen::VectorX<PassiveT> d = Eigen::VectorX<PassiveT>::Zero(_g.size());
+
+        for (int i = 0; i < _g.size(); i++) {
+            v[i] = beta1 * v[i] + (1 - beta1) * _g[i];
+            s[i] = beta2 * s[i] + (1 - beta2) * pow(_g[i], 2);
+            d[i] = -v[i] / (sqrt(s[i]) + epsilon);
+        }
         TINYAD_ASSERT_FINITE_MAT(d);
         return d;
     }
